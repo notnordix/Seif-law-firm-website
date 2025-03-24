@@ -34,10 +34,10 @@ export default function Home() {
               <div className="inline-block rounded-lg bg-white/10 px-3 py-1 text-sm text-white mb-4">
                 Professional Legal Services
               </div>
-              <h1 className="font-script text-4xl md:text-4xl lg:text-5xl tracking-tighter mb-6">
+              <h1 className="font-script text-4xl md:text-4xl lg:text-5xl tracking-tighter mb-4">
                 Expert Legal Solutions for Your Business Needs
               </h1>
-              <p className="text-sm md:text-2xl text-gray-200 mb-4 max-w-3xl">
+              <p className="text-sm md:text-2xl text-gray-200 mb-2 max-w-3xl">
                 "The only thing more expensive than hiring a lawyer is not hiring one." - Ayoub Seif El Islam
               </p>
               <p className="text-gray-300 text-xs md:text-xl mb-8 max-w-2xl">
