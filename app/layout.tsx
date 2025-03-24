@@ -54,11 +54,9 @@ export const metadata = {
     address: false,
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
-    apple: [{ url: "/icon-192.png" }],
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
@@ -69,7 +67,7 @@ export const metadata = {
     siteName: "Seif Law Firm",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Seif Law Firm",
@@ -80,7 +78,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Seif Law Firm - Expert Legal Solutions",
     description: "Professional legal services with a focus on business and commercial law in Morocco.",
-    images: ["/images/og-image.jpg"],
+    images: ["/og-image.jpg"],
   },
 }
 
@@ -91,11 +89,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
-      </head>
       <body className={`${greatVibes.variable} ${poppins.variable} ${roboto.variable} font-poppins`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}

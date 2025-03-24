@@ -37,6 +37,10 @@ type Appointment = {
   status: "pending" | "confirmed" | "cancelled"
 }
 
+// Make sure the appointments page is properly exported and accessible
+// Check if there are any issues with the component that might prevent it from rendering
+
+// Ensure the export is correct
 export default function AppointmentsPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())

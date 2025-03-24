@@ -7,6 +7,9 @@ import { Scale, LayoutDashboard, Calendar, FileText, LogOut, Menu, X, ChevronRig
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 
+// Update the handleLogout function to use NextAuth signOut
+import { signOut } from "next-auth/react"
+
 interface SidebarNavProps {
   isCollapsed: boolean
   onToggle: () => void
@@ -18,14 +21,12 @@ export function DashboardSidebar({ isCollapsed, onToggle }: SidebarNavProps) {
 
   const router = useRouter()
 
+  // Replace the existing handleLogout function with this:
   const handleLogout = () => {
-    // In a real app, you would clear auth tokens/cookies here
-    // For example: localStorage.removeItem('authToken')
-
-    // Redirect to login page
-    router.push("/admin/login")
+    signOut({ callbackUrl: "/admin/login" })
   }
 
+  // Fix the navigation links in the navItems array
   const navItems = [
     {
       name: "Dashboard",

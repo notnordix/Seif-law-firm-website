@@ -24,11 +24,22 @@ export const authOptions: NextAuthOptions = {
           )
 
           if (!user) {
+            console.log("User not found")
             return null
           }
 
+          // Add this log to debug
+          console.log("Found user:", { ...user, password: "HIDDEN" })
+
+          // Add these logs right before the password comparison
+          console.log("Credentials password length:", credentials.password.length)
+          console.log("Password from DB length:", user.password.length)
+
           // Verify password
           const isValid = await bcrypt.compare(credentials.password, user.password)
+
+          // Add this log to debug
+          console.log("Password valid:", isValid)
 
           if (!isValid) {
             return null

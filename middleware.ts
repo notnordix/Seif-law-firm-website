@@ -11,20 +11,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Skip authentication check for login page
+  if (path === "/admin/login") {
+    return NextResponse.next()
+  }
+
   // Check if the user is authenticated
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   })
 
-  // If it's the login page and the user is authenticated, redirect to dashboard
-  if (path === "/admin/login" && token) {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url))
-  }
-
-  // If it's not the login page and the user is not authenticated, redirect to login
-  if (path !== "/admin/login" && !token) {
-    return NextResponse.redirect(new URL("/admin/login", request.url))
+  // If not authenticated, redirect to login
+  if (!token) {
+    const url = new URL("/admin/login", request.url)
+    url.searchParams.set("callbackUrl", encodeURI(request.url))
+    return NextResponse.redirect(url)
   }
 
   // Add security headers

@@ -1,7 +1,21 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, FileText, Users, ArrowUp, ArrowDown } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export default function DashboardPage() {
+  const [isClient, setIsClient] = useState(false)
+
+  // This ensures the component only renders fully on the client
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) {
+    return <div className="p-6">Loading dashboard...</div>
+  }
+
   return (
     <div className="p-6">
       <div className="mb-8">

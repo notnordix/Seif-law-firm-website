@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,12 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Set isClient to true on mount
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,19 +39,20 @@ export default function AdminLoginPage() {
 
       if (result?.error) {
         setError("Invalid username or password")
-        setIsLoading(false)
-        return
-      }
-
-      if (result?.ok) {
+      } else {
         router.push("/admin/dashboard")
         router.refresh()
       }
-    } catch (err) {
+    } catch (err: any) {
       setError("An error occurred. Please try again.")
       console.error("Login error:", err)
+    } finally {
       setIsLoading(false)
     }
+  }
+
+  if (!isClient) {
+    return null // Don't render anything during SSR
   }
 
   return (

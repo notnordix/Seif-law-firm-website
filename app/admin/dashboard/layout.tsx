@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { DashboardSidebar } from "@/components/admin/dashboard-sidebar"
 import { cn } from "@/lib/utils"
@@ -12,18 +13,26 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   // Load sidebar state from localStorage if available
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    if (typeof window !== "undefined") {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  // Initialize sidebar state from localStorage on component mount
+  useEffect(() => {
+    try {
       const saved = localStorage.getItem("sidebarCollapsed")
-      return saved ? JSON.parse(saved) : false
+      if (saved !== null) {
+        setSidebarCollapsed(JSON.parse(saved))
+      }
+    } catch (error) {
+      console.error("Error loading sidebar state:", error)
     }
-    return false
-  })
+  }, [])
 
   // Save sidebar state to localStorage when it changes
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    try {
       localStorage.setItem("sidebarCollapsed", JSON.stringify(sidebarCollapsed))
+    } catch (error) {
+      console.error("Error saving sidebar state:", error)
     }
   }, [sidebarCollapsed])
 

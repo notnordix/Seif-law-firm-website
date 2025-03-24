@@ -21,6 +21,7 @@ type BlogPost = {
   status?: "draft" | "published"
 }
 
+// Ensure the export is correct
 export default function BlogPage() {
   const [activeTab, setActiveTab] = useState("all")
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
