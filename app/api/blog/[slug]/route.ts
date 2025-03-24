@@ -3,8 +3,10 @@ import { query, queryRow } from "@/lib/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(req: NextRequest, context: { params: { slug: string } }) {
   try {
+    // Await the params
+    const params = await context.params
     const slug = params.slug
 
     const sql = `
@@ -36,7 +38,7 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function PUT(req: NextRequest, context: { params: { slug: string } }) {
   try {
     // Check authentication
     const session = await getServerSession(authOptions)
@@ -44,7 +46,10 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Await the params
+    const params = await context.params
     const slug = params.slug
+
     const data = await req.json()
     const { title, slug: newSlug, excerpt, content, category, status } = data
 
@@ -86,7 +91,7 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function DELETE(req: NextRequest, context: { params: { slug: string } }) {
   try {
     // Check authentication
     const session = await getServerSession(authOptions)
@@ -94,6 +99,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { slug: str
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Await the params
+    const params = await context.params
     const slug = params.slug
 
     // Delete blog post

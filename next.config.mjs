@@ -12,10 +12,6 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    // Updated from serverComponentsExternalPackages to serverExternalPackages
-    serverExternalPackages: ['mysql2'],
-  },
   poweredByHeader: false,
   compress: true,
 };

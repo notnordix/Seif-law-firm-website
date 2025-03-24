@@ -3,7 +3,7 @@ import { query, queryRow } from "@/lib/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
   try {
     // Check authentication
     const session = await getServerSession(authOptions)
@@ -11,6 +11,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Await the params
+    const params = await context.params
     const id = params.id
 
     const sql = `
@@ -41,7 +43,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
   try {
     // Check authentication
     const session = await getServerSession(authOptions)
@@ -49,7 +51,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Await the params
+    const params = await context.params
     const id = params.id
+
     const data = await req.json()
     const { clientName, email, phone, date, time, service, notes, status } = data
 
