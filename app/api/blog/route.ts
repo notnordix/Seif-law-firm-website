@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { query } from "@/lib/db"
+import { query, queryRow } from "@/lib/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
@@ -7,10 +7,6 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const category = searchParams.get("category")
-    const slug = searchParams.get("slug")
-    const limit = Number.parseInt(searchParams.get("limit") || "10")
-    const page = Number.parseInt(searchParams.get("page") || "1")
-    const offset = (page - 1) * limit
 
     let sql = `
       SELECT 
@@ -18,37 +14,22 @@ export async function GET(req: NextRequest) {
         p.title, 
         p.slug, 
         p.excerpt, 
-        p.content, 
         p.cover_image_filename as coverImage, 
-        p.status,
         DATE_FORMAT(p.published_at, '%M %d, %Y') as date,
         c.name as category
       FROM blog_posts p
       LEFT JOIN blog_categories c ON p.category_id = c.id
-      WHERE 1=1
+      WHERE p.status = 'published'
     `
 
     const params: any[] = []
-
-    if (slug) {
-      sql += " AND p.slug = ?"
-      params.push(slug)
-    }
 
     if (category) {
       sql += " AND c.slug = ?"
       params.push(category)
     }
 
-    // Check if we need to filter by status
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      // If not authenticated, only show published posts
-      sql += ' AND p.status = "published"'
-    }
-
-    sql += " ORDER BY p.published_at DESC LIMIT ? OFFSET ?"
-    params.push(limit, offset)
+    sql += " ORDER BY p.published_at DESC"
 
     const posts = await query(sql, params)
 
@@ -68,17 +49,24 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await req.json()
-    const { title, slug, excerpt, content, category, status, coverImage } = data
+    const { title, slug, excerpt, content, category, status } = data
 
     // Validate required fields
     if (!title || !slug || !excerpt || !content || !category) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // Get category ID
-    const categoryResult = (await query("SELECT id FROM blog_categories WHERE name = ?", [category])) as any[]
+    // Check if slug already exists
+    const existingPost = await queryRow("SELECT id FROM blog_posts WHERE slug = ?", [slug])
 
-    if (!categoryResult.length) {
+    if (existingPost) {
+      return NextResponse.json({ error: "A post with this slug already exists" }, { status: 400 })
+    }
+
+    // Get category ID
+    const categoryResult = await queryRow("SELECT id FROM blog_categories WHERE name = ?", [category])
+
+    if (!categoryResult) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 })
     }
 
@@ -90,11 +78,10 @@ export async function POST(req: NextRequest) {
         excerpt, 
         content, 
         category_id, 
-        cover_image_filename,
-        status,
         author_id,
+        status,
         published_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ${status === "published" ? "CURRENT_TIMESTAMP" : "NULL"})
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `
 
     const result = await query(sql, [
@@ -102,10 +89,10 @@ export async function POST(req: NextRequest) {
       slug,
       excerpt,
       content,
-      categoryResult[0].id,
-      coverImage || "/images/blog-post1.jpg", // Default image if none provided
+      categoryResult.id,
+      1, // Default author ID
       status || "draft",
-      session.user.id,
+      status === "published" ? new Date() : null,
     ])
 
     return NextResponse.json({
