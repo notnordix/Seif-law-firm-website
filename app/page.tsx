@@ -37,10 +37,10 @@ export default function Home() {
               <h1 className="font-script text-4xl md:text-4xl lg:text-5xl tracking-tighter mb-6">
                 Expert Legal Solutions for Your Business Needs
               </h1>
-              <p className="text-xl md:text-2xl text-gray-200 mb-4 max-w-3xl">
+              <p className="text-sm md:text-2xl text-gray-200 mb-4 max-w-3xl">
                 "The only thing more expensive than hiring a lawyer is not hiring one." - Ayoub Seif El Islam
               </p>
-              <p className="text-gray-300 md:text-xl mb-8 max-w-2xl">
+              <p className="text-gray-300 text-xs md:text-xl mb-8 max-w-2xl">
                 Seif Law Firm provides comprehensive legal services with a focus on business law, commercial litigation,
                 and dispute resolution.
               </p>
