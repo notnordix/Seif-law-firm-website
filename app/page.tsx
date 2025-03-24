@@ -54,7 +54,7 @@ export default function Home() {
           </div>
 
           {/* Animated Chevron Scroll Indicator */}
-          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 h-16 w-16 flex justify-center">
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 h-16 w-16 flex justify-center">
             <div className="chevron"></div>
             <div className="chevron"></div>
             <div className="chevron"></div>
