@@ -3,11 +3,11 @@ import { query, queryRow } from "@/lib/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
-export async function GET(req: NextRequest, context: { params: { slug: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     // Await the params
-    const params = await context.params
-    const slug = params.slug
+    const resolvedParams = await params
+    const slug = resolvedParams.slug
 
     const sql = `
       SELECT 
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
   }
 }
 
-export async function PUT(req: NextRequest, context: { params: { slug: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     // Check authentication
     const session = await getServerSession(authOptions)
@@ -47,8 +47,8 @@ export async function PUT(req: NextRequest, context: { params: { slug: string } 
     }
 
     // Await the params
-    const params = await context.params
-    const slug = params.slug
+    const resolvedParams = await params
+    const slug = resolvedParams.slug
 
     const data = await req.json()
     const { title, slug: newSlug, excerpt, content, category, status } = data
@@ -91,7 +91,7 @@ export async function PUT(req: NextRequest, context: { params: { slug: string } 
   }
 }
 
-export async function DELETE(req: NextRequest, context: { params: { slug: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     // Check authentication
     const session = await getServerSession(authOptions)
@@ -100,8 +100,8 @@ export async function DELETE(req: NextRequest, context: { params: { slug: string
     }
 
     // Await the params
-    const params = await context.params
-    const slug = params.slug
+    const resolvedParams = await params
+    const slug = resolvedParams.slug
 
     // Delete blog post
     await query("DELETE FROM blog_posts WHERE slug = ?", [slug])

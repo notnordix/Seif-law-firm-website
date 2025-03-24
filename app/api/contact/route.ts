@@ -5,10 +5,10 @@ import ContactFormEmail from "@/components/emails/contact-form-email"
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json()
-    const { name, email, message } = data
+    const { firstName, lastName, email, message, subject, phone, service } = data
 
     // Validate required fields
-    if (!name || !email || !message) {
+    if (!firstName || !email || !message) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
@@ -16,9 +16,9 @@ export async function POST(req: NextRequest) {
     const { data: emailData, error } = await resend.emails.send({
       from: "Contact Form <contact@seiflawfirm.com>",
       to: ["ayoub.seif@seiflawfirm.com"],
-      subject: `New Contact Form Submission from ${name}`,
-      react: ContactFormEmail({ name, email, message }),
-      reply_to: email,
+      subject: `New Contact Form Submission from ${firstName} ${lastName || ""}`.trim(),
+      react: ContactFormEmail({ firstName, lastName, email, phone, subject, message, service }),
+      replyTo: email,
     })
 
     if (error) {

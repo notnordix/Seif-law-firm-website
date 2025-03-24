@@ -1,16 +1,34 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { getToken } from "next-auth/jwt"
 
-export function middleware(request: NextRequest) {
-  // Clone the request headers
-  const requestHeaders = new Headers(request.headers)
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
+export async function middleware(request: NextRequest) {
+  // Get the pathname of the request
+  const path = request.nextUrl.pathname
+
+  // If it's not an admin path, don't do anything
+  if (!path.startsWith("/admin")) {
+    return NextResponse.next()
+  }
+
+  // Check if the user is authenticated
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
   })
 
+  // If it's the login page and the user is authenticated, redirect to dashboard
+  if (path === "/admin/login" && token) {
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url))
+  }
+
+  // If it's not the login page and the user is not authenticated, redirect to login
+  if (path !== "/admin/login" && !token) {
+    return NextResponse.redirect(new URL("/admin/login", request.url))
+  }
+
   // Add security headers
+  const response = NextResponse.next()
   response.headers.set("X-DNS-Prefetch-Control", "on")
   response.headers.set("X-XSS-Protection", "1; mode=block")
   response.headers.set("X-Frame-Options", "SAMEORIGIN")
@@ -26,15 +44,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public (public files)
-     */
-    "/((?!_next/static|_next/image|favicon.ico|public).*)",
-  ],
+  matcher: ["/admin/:path*"],
 }
 

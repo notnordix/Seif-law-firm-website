@@ -12,6 +12,7 @@ const nextConfig = {
       },
     ],
   },
+  // Remove the unsupported experimental option
   poweredByHeader: false,
   compress: true,
 };

@@ -25,8 +25,9 @@ import {
   endOfWeek,
 } from "date-fns"
 
+// Make sure this type matches exactly with the Appointment type in the dashboard
 type AppointmentType = {
-  id?: number
+  id: number // Changed from optional to required to match dashboard
   clientName: string
   email: string
   phone: string
@@ -41,7 +42,7 @@ interface AppointmentModalProps {
   isOpen: boolean
   onClose: () => void
   appointment?: AppointmentType | null
-  onSave: (appointment: AppointmentType) => void
+  onSave: (appointment: AppointmentType) => Promise<void> // Changed to accept Promise<void>
   mode: "add" | "view" | "edit"
 }
 
@@ -53,6 +54,7 @@ export function AppointmentModal({ isOpen, onClose, appointment, onSave, mode }:
   const [step, setStep] = useState(1)
   const [showTimeSlots, setShowTimeSlots] = useState(false)
   const [formData, setFormData] = useState<AppointmentType>({
+    id: 0, // Default ID for new appointments
     clientName: "",
     email: "",
     phone: "",
@@ -89,6 +91,7 @@ export function AppointmentModal({ isOpen, onClose, appointment, onSave, mode }:
       setStep(2) // Go directly to form step for edit/view
     } else {
       setFormData({
+        id: 0, // Default ID for new appointments
         clientName: "",
         email: "",
         phone: "",
@@ -127,7 +130,7 @@ export function AppointmentModal({ isOpen, onClose, appointment, onSave, mode }:
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (mode === "add" || mode === "edit") {
@@ -138,21 +141,26 @@ export function AppointmentModal({ isOpen, onClose, appointment, onSave, mode }:
         time: selectedTime || "09:00",
       }
 
-      onSave(appointmentData)
+      try {
+        await onSave(appointmentData)
 
-      if (mode === "add") {
-        setFormSubmitted(true)
-        // Reset form after 2 seconds and close modal
-        setTimeout(() => {
-          setFormSubmitted(false)
+        if (mode === "add") {
+          setFormSubmitted(true)
+          // Reset form after 2 seconds and close modal
+          setTimeout(() => {
+            setFormSubmitted(false)
+            onClose()
+            setSelectedDate(null)
+            setSelectedTime(null)
+            setStep(1)
+            setShowTimeSlots(false)
+          }, 2000)
+        } else {
           onClose()
-          setSelectedDate(null)
-          setSelectedTime(null)
-          setStep(1)
-          setShowTimeSlots(false)
-        }, 2000)
-      } else {
-        onClose()
+        }
+      } catch (error) {
+        console.error("Error saving appointment:", error)
+        // Handle error if needed
       }
     } else {
       onClose()

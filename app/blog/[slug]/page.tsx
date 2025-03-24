@@ -1,3 +1,6 @@
+"use client"
+
+import { use } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Calendar, ChevronLeft } from "lucide-react"
@@ -7,71 +10,12 @@ import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
 import { generateBlogPostSchema } from "@/lib/structured-data"
 import Script from "next/script"
-import type { Metadata } from "next"
-import { queryRow } from "@/lib/db"
+import { getBlogPostBySlug } from "../blog-data"
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  // Await the params object before accessing its properties
-  const resolvedParams = await params
-  const post = await getBlogPost(resolvedParams.slug)
-
-  if (!post) {
-    return {
-      title: "Post Not Found",
-    }
-  }
-
-  return {
-    title: post.title,
-    description: post.excerpt,
-    metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      type: "article",
-      publishedTime: post.date,
-      authors: ["Ayoub Seif El Islam"],
-      images: [
-        {
-          url: post.coverImage,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        },
-      ],
-    },
-  }
-}
-
-async function getBlogPost(slug: string) {
-  try {
-    const sql = `
-      SELECT 
-        p.id, 
-        p.title, 
-        p.slug, 
-        p.excerpt, 
-        p.content, 
-        p.cover_image_filename as coverImage, 
-        DATE_FORMAT(p.published_at, '%M %d, %Y') as date,
-        c.name as category
-      FROM blog_posts p
-      LEFT JOIN blog_categories c ON p.category_id = c.id
-      WHERE p.slug = ? AND p.status = 'published'
-    `
-
-    const post = await queryRow(sql, [slug])
-    return post
-  } catch (error) {
-    console.error("Error fetching blog post:", error)
-    return null
-  }
-}
-
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  // Await the params object before accessing its properties
-  const resolvedParams = await params
-  const post = await getBlogPost(resolvedParams.slug)
+export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Unwrap the params Promise using React.use()
+  const resolvedParams = use(params)
+  const post = getBlogPostBySlug(resolvedParams.slug)
 
   if (!post) {
     notFound()
